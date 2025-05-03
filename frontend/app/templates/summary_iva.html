@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Resumen IVA{% endblock %}
+{% block content %}
+<h1>Resumen de IVA</h1>
+<form method="get" class="row g-3 mb-4">
+  <div class="col-auto">
+    <input type="text" name="fecha" placeholder="dd/mm/yyyy" value="{{ chart_data.fecha }}" class="form-control">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">Consultar</button>
+  </div>
+</form>
+
+{% if chart_data.iva_emitido %}
+  <div class="row">
+    <div class="col-md-6">
+      <h5>IVA Emitido</h5>
+      {{ chart_data.iva_emitido|json_script:"emitido-data" }}
+      <canvas id="graficaEmitido"></canvas>
+    </div>
+    <div class="col-md-6">
+      <h5>IVA Recibido</h5>
+      {{ chart_data.iva_recibido|json_script:"recibido-data" }}
+      <canvas id="graficaRecibido"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const emitido = JSON.parse(document.getElementById('emitido-data').textContent);
+    new Chart(document.getElementById('graficaEmitido'), {
+      type: 'bar',
+      data: { labels:Object.keys(emitido), datasets:[{label:'IVA Emitido',data:Object.values(emitido)}] }
+    });
+    const recibido = JSON.parse(document.getElementById('recibido-data').textContent);
+    new Chart(document.getElementById('graficaRecibido'), {
+      type: 'bar',
+      data: { labels:Object.keys(recibido), datasets:[{label:'IVA Recibido',data:Object.values(recibido)}] }
+    });
+  </script>
+{% endif %}
+{% endblock %}

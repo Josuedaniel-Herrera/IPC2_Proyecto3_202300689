@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Resumen por Rango{% endblock %}
+{% block content %}
+<h1>Resumen por Rango de Fechas</h1>
+
+<form method="get" class="row g-3 mb-4">
+  <div class="col-auto">
+    <input type="text"
+           name="fecha_inicio"
+           placeholder="dd/mm/yyyy"
+           value="{{ fecha_inicio }}"
+           class="form-control"
+           required>
+  </div>
+  <div class="col-auto">
+    <input type="text"
+           name="fecha_fin"
+           placeholder="dd/mm/yyyy"
+           value="{{ fecha_fin }}"
+           class="form-control"
+           required>
+  </div>
+  <div class="col-auto">
+    <select name="tipo" class="form-select">
+      <option value="total"   {% if tipo == 'total' %}selected{% endif %}>Valor Total</option>
+      <option value="siniva"  {% if tipo == 'siniva' %}selected{% endif %}>Valor sin IVA</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">Consultar</button>
+  </div>
+</form>
+
+{% if chart_data.datos %}
+  {# Inyecta los datos y dibuja la gráfica #}
+  {{ chart_data.datos|json_script:"datos-range" }}
+  <div style="max-width: 800px;">
+    <canvas id="graficaRange"></canvas>
+  </div>
+  <script>
+    const datos = JSON.parse(document.getElementById('datos-range').textContent);
+    const tipo = '{{ tipo }}';
+    new Chart(
+      document.getElementById('graficaRange'),
+      {
+        type: 'bar',
+        data: {
+          labels: datos.map(d => d.fecha),
+          datasets: [{
+            label: tipo === 'total' ? 'Valor Total' : 'Valor sin IVA',
+            data: datos.map(d => d.valor)
+          }]
+        }
+      }
+    );
+  </script>
+
+{% elif fecha_inicio and fecha_fin %}
+  <div class="alert alert-warning">
+    No hay datos para el rango {{ fecha_inicio }} – {{ fecha_fin }}.
+  </div>
+{% endif %}
+
+{% endblock %}

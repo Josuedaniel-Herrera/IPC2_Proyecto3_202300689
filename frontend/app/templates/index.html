@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Cargar Archivo{% endblock %}
+{% block content %}
+<h1>Cargar solicitudes de DTE</h1>
+<form method="post" enctype="multipart/form-data" class="mb-4">
+  {% csrf_token %}
+  <div class="mb-3">
+    <input type="file" name="archivo" accept=".xml" class="form-control" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Enviar</button>
+</form>
+
+{% if result %}
+  <div class="alert alert-info">{{ result }}</div>
+{% endif %}
+
+{% if fechas %}
+  <div class="card mt-3">
+    <div class="card-body">
+      <h5>Fechas procesadas en este archivo:</h5>
+      <ul>
+        {% for f in fechas %}
+          <li><a href="{% url 'consultar' %}?fecha={{ f }}">{{ f }}</a></li>
+        {% endfor %}
+      </ul>
+      <small>Haz clic para ver estadísticas.</small>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

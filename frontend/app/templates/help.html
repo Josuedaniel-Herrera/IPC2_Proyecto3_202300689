@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Ayuda{% endblock %}
+{% block content %}
+<h1>Ayuda</h1>
+<ul>
+  <li><a href="{% url 'student_info' %}">Información del Estudiante</a></li>
+  <li><a href="{% url 'program_doc' %}">Documentación del Programa</a></li>
+</ul>
+{% endblock %}

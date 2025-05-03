@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Consultar Estadísticas{% endblock %}
+{% block content %}
+<h1>Consultar Estadísticas</h1>
+
+{# Formulario para ingresar o cambiar la fecha #}
+<form method="get" class="row g-3 mb-4">
+  <div class="col-auto">
+    <input type="text"
+           name="fecha"
+           placeholder="dd/mm/yyyy"
+           value="{{ fecha }}"
+           class="form-control"
+           required>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">Consultar</button>
+  </div>
+</form>
+
+{# Si hay datos para esa fecha, los mostramos #}
+{% if data %}
+  <div class="mb-4">
+    <h4>Datos Generales para {{ fecha }}</h4>
+    <ul class="list-group">
+      <li class="list-group-item">Facturas recibidas: {{ data.facturas_recibidas }}</li>
+      <li class="list-group-item">Facturas correctas: {{ data.facturas_correctas }}</li>
+      <li class="list-group-item">Emisores distintos: {{ data.emisores|length }}</li>
+      <li class="list-group-item">Receptores distintos: {{ data.receptores|length }}</li>
+    </ul>
+  </div>
+
+  <div class="mb-4">
+    <h4>Errores</h4>
+    {{ data.errores|json_script:"errores-data" }}
+    <canvas id="graficaErrores" style="max-width:600px;"></canvas>
+  </div>
+
+  <script>
+    const errores = JSON.parse(
+      document.getElementById('errores-data').textContent
+    );
+    new Chart(
+      document.getElementById('graficaErrores'),
+      {
+        type: 'bar',
+        data: {
+          labels: Object.keys(errores),
+          datasets: [{ label: 'Errores', data: Object.values(errores) }]
+        }
+      }
+    );
+  </script>
+
+{% else %}
+  {# Si no hay datos y el usuario ingresó fecha, aviso #}
+  {% if fecha %}
+    <div class="alert alert-warning">
+      No hay datos para la fecha {{ fecha }}.
+    </div>
+  {% endif %}
+{% endif %}
+
+{% endblock %}
